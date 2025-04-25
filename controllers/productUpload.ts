@@ -2,24 +2,27 @@ import AWS from "aws-sdk";
 import fs from "fs/promises";
 import dotenv from "dotenv";
 import Data from "../models/productData.model.js";
+import { Request, Response } from "express";
 
 dotenv.config();
 const s3 = new AWS.S3({
     credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY,
-        secretAccessKey: process.env.AWS_SECRET_KEY,
+        accessKeyId: process.env.AWS_ACCESS_KEY!,
+        secretAccessKey: process.env.AWS_SECRET_KEY!,
     },
     region: process.env.AWS_REGION,
 });
 
-export default async function productUpload(req, res) {
+export default async function productUpload(req: Request, res: Response): Promise<void> {
     const { name, description, price, s3Url, s3FileName } = req.body;
     if (!name || !description || !price || s3Url || s3FileName) {
-        return res.status(400).json({ message: "Please provide name, description, and price." });
+        res.status(400).json({ message: "Please provide name, description, and price." });
+        return; // Important:  Return here
     }
 
     if (!req.file) {
-        return res.status(400).send("No file uploaded.");
+        res.status(400).send("No file uploaded.");
+        return; // Important: Return here
     }
 
     try {
