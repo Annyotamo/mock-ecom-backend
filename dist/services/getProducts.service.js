@@ -8,12 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const getProducts_service_1 = require("../services/getProducts.service");
-function getProducts(req, res) {
+exports.getProducts = void 0;
+const productData_model_1 = __importDefault(require("../models/productData.model"));
+function getProducts() {
     return __awaiter(this, void 0, void 0, function* () {
-        const dataInfo = (0, getProducts_service_1.getProducts)();
-        res.json(dataInfo);
+        return yield productData_model_1.default.find({});
     });
 }
-exports.default = getProducts;
+exports.getProducts = getProducts;

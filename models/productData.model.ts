@@ -1,6 +1,16 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 
-const productDataSchema = new Schema(
+export interface Product extends Document {
+    name: String;
+    description: String;
+    price: Number;
+    s3Url: String;
+    s3FileName: String;
+}
+
+interface ProductDocument extends Product, Document {}
+
+const productDataSchema = new Schema<Product>(
     {
         name: {
             type: String,
@@ -26,4 +36,4 @@ const productDataSchema = new Schema(
     { timestamps: true }
 );
 
-export default model("Data", productDataSchema);
+export default model<Product>("Data", productDataSchema);
