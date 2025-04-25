@@ -1,5 +1,6 @@
 import AWS from "aws-sdk";
 import dotenv from "dotenv";
+import productData from "../models/productData.model.js";
 
 dotenv.config();
 const s3 = new AWS.S3({
@@ -13,7 +14,6 @@ const s3 = new AWS.S3({
 export default async function getProducts(req, res) {
     let products = [];
     const dataInfo = await productData.find({});
-    dataInfo.map((data) => {
-        const fileName = data.fileName;
-    });
+    console.log(dataInfo);
+    res.json({ message: "Working!" });
 }

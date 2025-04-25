@@ -1,6 +1,7 @@
 import express from "express";
 import connectDB from "./config/db.js";
 import productUploadRouter from "./routes/productUpload.route.js";
+import productsRouter from "./routes/products.route.js";
 import cors from "cors";
 
 const port = 8000;
@@ -12,8 +13,9 @@ async function startServer() {
     server.use(express.json());
     server.use(express.urlencoded());
     server.use("/api/upload", productUploadRouter);
-    server.use("/api/products");
-    server.use("/api/buy");
+    server.use("/api/products", productsRouter);
+    // server.use("/api/purchase");
+    // server.use("/api/auth");
 }
 
 startServer();

@@ -17,6 +17,7 @@ export default async function productUpload(req, res) {
     if (!name || !description || !price || s3Url || s3FileName) {
         return res.status(400).json({ message: "Please provide name, description, and price." });
     }
+
     if (!req.file) {
         return res.status(400).send("No file uploaded.");
     }
@@ -40,12 +41,13 @@ export default async function productUpload(req, res) {
             s3FileName: req.file.filename,
             s3Url: data.Location,
         });
+        const savedProduct = await newProduct.save();
 
         await fs.unlink(req.file.path);
 
         res.status(200).send({
             message: "Product successfully created",
-            product: newProduct,
+            product: savedProduct,
         });
     } catch (error) {
         console.error("Error uploading to S3:", error);
