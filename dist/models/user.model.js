@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userSchema = new mongoose_1.default.Schema({
     phone: {
         type: Number,
@@ -59,8 +59,8 @@ userSchema.pre("save", function (next) {
         if (!this.isModified("password"))
             return next();
         try {
-            const salt = yield bcrypt_1.default.genSalt(10);
-            this.password = yield bcrypt_1.default.hash(this.password, salt);
+            const salt = yield bcryptjs_1.default.genSalt(10);
+            this.password = yield bcryptjs_1.default.hash(this.password, salt);
             next();
         }
         catch (error) {

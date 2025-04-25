@@ -1,24 +1,9 @@
-import express from "express";
-import bodyParser from "body-parser";
-import * as auth from "../config/auth";
+import { Router } from "express";
 import { registerUser, loginUser } from "../controllers/userActions.controller";
 
-const app = express();
-const PORT = 3000;
+const router = Router();
 
-app.use(bodyParser.json());
+router.post("/register", registerUser);
+router.post("/login", loginUser);
 
-app.post("/register", registerUser);
-app.post("/login", loginUser);
-
-// app.get("/protected", auth.authenticateToken, (req, res) => {
-//     res.json({ message: "This is a protected route", user: req.user });
-// });
-
-// app.get("/admin", auth.authenticateToken, auth.authorizeRole(["admin"]), (req, res) => {
-//     res.json({ message: "Admin access granted", user: req.user });
-// });
-
-// app.listen(PORT, () => {
-//     console.log(`Server is running on http://localhost:${PORT}`);
-// });
+export default router;

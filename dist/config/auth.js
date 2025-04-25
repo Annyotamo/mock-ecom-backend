@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authorizeRole = exports.authenticateToken = exports.verifyToken = exports.generateToken = exports.comparePassword = exports.hashPassword = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const JWT_SECRET = process.env.JWT_SECRET_KEY;
@@ -22,13 +22,13 @@ const JWT_EXPIRES_IN = "2m";
 function hashPassword(password) {
     return __awaiter(this, void 0, void 0, function* () {
         const saltRounds = 10;
-        return yield bcrypt_1.default.hash(password, saltRounds);
+        return yield bcryptjs_1.default.hash(password, saltRounds);
     });
 }
 exports.hashPassword = hashPassword;
 function comparePassword(plainPassword, hashedPassword) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield bcrypt_1.default.compare(plainPassword, hashedPassword);
+        return yield bcryptjs_1.default.compare(plainPassword, hashedPassword);
     });
 }
 exports.comparePassword = comparePassword;

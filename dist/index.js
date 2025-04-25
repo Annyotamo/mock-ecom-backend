@@ -17,6 +17,7 @@ const db_js_1 = __importDefault(require("./config/db.js"));
 const productUpload_route_js_1 = __importDefault(require("./routes/productUpload.route.js"));
 const products_route_js_1 = __importDefault(require("./routes/products.route.js"));
 const cors_1 = __importDefault(require("cors"));
+const userActions_route_1 = __importDefault(require("./routes/userActions.route"));
 const port = 8000;
 const server = (0, express_1.default)();
 function startServer() {
@@ -27,8 +28,8 @@ function startServer() {
         server.use(express_1.default.urlencoded());
         server.use("/api/upload", productUpload_route_js_1.default);
         server.use("/api/products", products_route_js_1.default);
+        server.use("/api/auth", userActions_route_1.default);
         // server.use("/api/purchase");
-        // server.use("/api/auth");
     });
 }
 startServer();
