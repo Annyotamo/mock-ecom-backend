@@ -1,36 +1,43 @@
-import mongoose, { model } from "mongoose";
-import bcrypt from "bcryptjs";
+import mongoose, { Document, model, Model } from "mongoose";
+import bcrypt from "bcrypt";
 
-const userSchema = new mongoose.Schema(
+interface IUser extends Document {
+    phone: number;
+    password: string;
+    role: string[];
+}
+
+const userSchema = new mongoose.Schema<IUser>(
     {
-        email: {
-            type: String,
-            required: [true, "Please provide an email"],
+        phone: {
+            type: Number,
+            required: [true, "Please provide your phone number"],
             unique: true,
             trim: true,
-            lowercase: true,
-            match: [/\S+@\S+\.\S+/, "Please provide a valid email"],
         },
         password: {
             type: String,
             required: [true, "Please provide a password"],
-            minlength: 6,
             select: false,
+        },
+        role: {
+            type: [String],
+            required: true,
         },
     },
     { timestamps: true }
 );
 
-// Hash password before saving
-userSchema.pre("save", async function (next) {
+userSchema.pre<IUser>("save", async function (next) {
     if (!this.isModified("password")) return next();
-    this.password = await bcrypt.hash(this.password, 10);
-    next();
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        next(error as Error);
+    }
 });
 
-// Method to compare passwords
-userSchema.methods.comparePassword = async function (candidatePassword: string) {
-    return await bcrypt.compare(candidatePassword, this.password);
-};
-
-export default model("User", userSchema);
+export default model<IUser>("User", userSchema);
