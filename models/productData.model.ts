@@ -34,4 +34,4 @@ const productDataSchema = new Schema<Product>(
     { timestamps: true }
 );
 
-export default model<Product>("Data", productDataSchema);
+export default model<Product>("Product", productDataSchema);
