@@ -38,6 +38,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userSchema = new mongoose_1.default.Schema({
+    name: {
+        type: String,
+        required: true,
+    },
     phone: {
         type: Number,
         required: [true, "Please provide your phone number"],

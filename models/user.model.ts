@@ -2,6 +2,7 @@ import mongoose, { Document, model, Model } from "mongoose";
 import bcrypt from "bcryptjs";
 
 export interface IUser extends Document {
+    name: string;
     phone: number;
     password: string;
     role: string[];
@@ -9,6 +10,10 @@ export interface IUser extends Document {
 
 const userSchema = new mongoose.Schema<IUser>(
     {
+        name: {
+            type: String,
+            required: true,
+        },
         phone: {
             type: Number,
             required: [true, "Please provide your phone number"],

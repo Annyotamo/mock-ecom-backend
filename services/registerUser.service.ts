@@ -4,9 +4,9 @@ import userModel from "../models/user.model.js";
 
 export default async function registerUserHelper(req: Request, res: Response) {
     try {
-        const { phone, password, role = ["user"] } = req.body;
+        const { name, phone, password, role = ["user"] } = req.body;
 
-        if (!phone || !password) {
+        if (!phone || !password || !name) {
             return {
                 status: StatusCodes.BAD_REQUEST,
                 data: {
@@ -40,6 +40,7 @@ export default async function registerUserHelper(req: Request, res: Response) {
         }
 
         const user = await userModel.create({
+            name,
             phone,
             password,
             role,

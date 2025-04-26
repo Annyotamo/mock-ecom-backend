@@ -17,8 +17,8 @@ const user_model_js_1 = __importDefault(require("../models/user.model.js"));
 function registerUserHelper(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { phone, password, role = ["user"] } = req.body;
-            if (!phone || !password) {
+            const { name, phone, password, role = ["user"] } = req.body;
+            if (!phone || !password || !name) {
                 return {
                     status: statusCodes_js_1.StatusCodes.BAD_REQUEST,
                     data: {
@@ -48,6 +48,7 @@ function registerUserHelper(req, res) {
                 };
             }
             const user = yield user_model_js_1.default.create({
+                name,
                 phone,
                 password,
                 role,
