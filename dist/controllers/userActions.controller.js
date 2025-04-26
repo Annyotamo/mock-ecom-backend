@@ -13,57 +13,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginUser = exports.registerUser = void 0;
-const user_model_js_1 = __importDefault(require("../models/user.model.js"));
 const statusCodes_js_1 = require("../utils/statusCodes.js");
-const auth_js_1 = require("../config/auth.js");
+const registerUser_service_js_1 = __importDefault(require("../services/registerUser.service.js"));
+const loginUser_service_js_1 = __importDefault(require("../services/loginUser.service.js"));
 function registerUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const { phone, password, role = ["user"] } = req.body;
-            if (!phone || !password) {
-                res.status(statusCodes_js_1.StatusCodes.BAD_REQUEST).json({
-                    success: false,
-                    message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.BAD_REQUEST],
-                });
-                return;
-            }
-            const existingUser = yield user_model_js_1.default.findOne({ phone });
-            if (existingUser) {
-                res.status(statusCodes_js_1.StatusCodes.BAD_REQUEST).json({
-                    success: false,
-                    message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.BAD_REQUEST],
-                });
-                return;
-            }
-            const user = yield user_model_js_1.default.create({
-                phone,
-                password,
-                role,
-            });
-            const token = (0, auth_js_1.generateToken)({ id: user._id, phone: user.phone, role: user.role });
-            res.status(statusCodes_js_1.StatusCodes.CREATED).json({
-                success: true,
-                message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.CREATED],
-                token,
-                user: {
-                    id: user._id,
-                    phone: user.phone,
-                    role: user.role,
-                },
-            });
-        }
-        catch (error) {
-            console.error("Registration error:", error);
-            res.status(statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR],
-            });
-            return;
-        }
+        const newUser = yield (0, registerUser_service_js_1.default)(req, res);
+        res.status(statusCodes_js_1.StatusCodes.ACCEPTED).json(newUser);
+        return;
     });
 }
 exports.registerUser = registerUser;
 function loginUser(req, res) {
-    return __awaiter(this, void 0, void 0, function* () { });
+    return __awaiter(this, void 0, void 0, function* () {
+        const loggedInUser = yield (0, loginUser_service_js_1.default)(req, res);
+        res.status(statusCodes_js_1.StatusCodes.ACCEPTED).json(loggedInUser);
+        return;
+    });
 }
 exports.loginUser = loginUser;

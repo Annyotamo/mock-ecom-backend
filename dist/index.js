@@ -26,7 +26,8 @@ function startServer() {
         server.use((0, cors_1.default)());
         server.use(express_1.default.json());
         server.use(express_1.default.urlencoded());
-        server.use("/api/upload", productUpload_route_js_1.default);
+        server.use("/api/product/upload", productUpload_route_js_1.default);
+        // server.use("/api/product/delete");
         server.use("/api/products", products_route_js_1.default);
         server.use("/api/auth", userActions_route_1.default);
         // server.use("/api/purchase");

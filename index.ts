@@ -13,7 +13,8 @@ async function startServer() {
     server.use(cors());
     server.use(express.json());
     server.use(express.urlencoded());
-    server.use("/api/upload", productUploadRouter);
+    server.use("/api/product/upload", productUploadRouter);
+    // server.use("/api/product/delete");
     server.use("/api/products", productsRouter);
     server.use("/api/auth", userActionsRouter);
     // server.use("/api/purchase");

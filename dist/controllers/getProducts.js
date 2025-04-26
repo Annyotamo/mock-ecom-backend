@@ -10,10 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const getProducts_service_1 = require("../services/getProducts.service");
+const statusCodes_1 = require("../utils/statusCodes");
 function getProducts(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const dataInfo = (0, getProducts_service_1.getProducts)();
-        res.json(dataInfo);
+        const dataInfo = yield (0, getProducts_service_1.getProducts)();
+        res.status(statusCodes_1.StatusCodes.ACCEPTED).json(dataInfo);
     });
 }
 exports.default = getProducts;
