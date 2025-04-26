@@ -4,7 +4,7 @@ import purchaseProduct from "../controllers/purchaseProduct.js";
 
 const router = Router();
 
-router.get("/", getProducts);
+router.get("/all", getProducts);
 router.get("/purchase", purchaseProduct);
 
 export default router;

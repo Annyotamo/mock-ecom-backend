@@ -7,6 +7,6 @@ const express_1 = require("express");
 const deleteTransaction_1 = __importDefault(require("../controllers/deleteTransaction"));
 const getTransactions_1 = __importDefault(require("../controllers/getTransactions"));
 const router = (0, express_1.Router)();
-router.get("/", getTransactions_1.default);
+router.get("/all", getTransactions_1.default);
 router.delete("/delete", deleteTransaction_1.default);
 exports.default = router;

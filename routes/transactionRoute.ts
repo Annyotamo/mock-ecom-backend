@@ -4,7 +4,7 @@ import getTransactions from "../controllers/getTransactions";
 
 const router = Router();
 
-router.get("/", getTransactions);
+router.get("/all", getTransactions);
 router.delete("/delete", deleteTransaction);
 
 export default router;
