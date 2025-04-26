@@ -17,7 +17,7 @@ async function startServer() {
     server.use(express.json());
     server.use(express.urlencoded());
     server.use("/api/product", authenticateToken, authorizeRole(["admin"]), productActionsRouter);
-    server.use("/api/products", authenticateToken, productsRouter);
+    server.use("/api/products", productsRouter);
     server.use("/api/auth", userActionsRouter);
     server.use("/api/user", authenticateToken, authorizeRole(["admin"]), adminUserActionsRouter);
     server.use("/api/transaction", authenticateToken, authorizeRole(["admin"]), transactionsRouter);

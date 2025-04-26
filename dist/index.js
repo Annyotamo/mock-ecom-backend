@@ -30,7 +30,7 @@ function startServer() {
         server.use(express_1.default.json());
         server.use(express_1.default.urlencoded());
         server.use("/api/product", auth_1.authenticateToken, (0, auth_1.authorizeRole)(["admin"]), productActions_route_1.default);
-        server.use("/api/products", auth_1.authenticateToken, products_route_1.default);
+        server.use("/api/products", products_route_1.default);
         server.use("/api/auth", userActions_route_1.default);
         server.use("/api/user", auth_1.authenticateToken, (0, auth_1.authorizeRole)(["admin"]), adminUserActions_route_1.default);
         server.use("/api/transaction", auth_1.authenticateToken, (0, auth_1.authorizeRole)(["admin"]), transactionRoute_1.default);
