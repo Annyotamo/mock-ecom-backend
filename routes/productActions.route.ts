@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import path from "path";
 import multer from "multer";
 import productUpload from "../controllers/productUpload.js";
+import deleteProduct from "../controllers/deleteProduct.js";
 
 dotenv.config();
 const router = Router();
@@ -21,6 +22,7 @@ const upload = multer({
     limits: { fileSize: 10 * 1024 * 1024 },
 });
 
-router.post("/", upload.single("file"), productUpload);
+router.post("/upload", upload.single("file"), productUpload);
+router.delete("/delete", deleteProduct);
 
 export default router;

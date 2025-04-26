@@ -12,31 +12,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/services/loginUser.service.js (adjust path if needed)
-const user_model_js_1 = __importDefault(require("../models/user.model.js"));
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const auth_js_1 = require("../config/auth.js");
-function loginUserHelper(phone, password) {
+const productData_model_1 = __importDefault(require("../models/productData.model"));
+const statusCodes_1 = require("../utils/statusCodes");
+function deleteProductHelper(id) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const user = yield user_model_js_1.default.findOne({ phone: phone }).select("+password");
-            if (!user) {
-                return null;
-            }
-            const isPasswordValid = yield bcryptjs_1.default.compare(password, user.password);
-            if (!isPasswordValid) {
-                return null;
-            }
-            const token = (0, auth_js_1.generateToken)({ id: user._id, phone: user.phone, role: user.role });
+            const deletedUser = yield productData_model_1.default.deleteOne({ _id: id });
             return {
-                id: user._id,
-                token: token,
+                status: statusCodes_1.StatusCodes.ACCEPTED,
+                user: deletedUser,
             };
         }
         catch (error) {
-            console.error("Login service error:", error);
-            throw error;
+            console.log("Error:", error);
+            return {
+                status: statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR,
+                error: error,
+            };
         }
     });
 }
-exports.default = loginUserHelper;
+exports.default = deleteProductHelper;

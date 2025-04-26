@@ -1,37 +1,30 @@
+// src/services/loginUser.service.js (adjust path if needed)
 import userModel from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../config/auth.js";
-import { StatusCodes, StatusMessages } from "../utils/statusCodes.js";
-import { Request, Response } from "express";
 
-export default async function loginUserHelper(req: Request, res: Response) {
+export default async function loginUserHelper(phone: string, password: string) {
     try {
-        const { phone, password } = req.body;
-
-        if (!phone || !password) {
-            return res.status(StatusCodes.BAD_REQUEST).json({ message: StatusMessages[StatusCodes.BAD_REQUEST] });
-        }
-
-        const user = await userModel.findOne({ phone: phone });
+        const user = await userModel.findOne({ phone: phone }).select("+password");
 
         if (!user) {
-            return res.status(StatusCodes.BAD_REQUEST).json({ message: StatusMessages[StatusCodes.BAD_REQUEST] });
+            return null;
         }
 
-        const isPasswordValid = bcrypt.compare(password, user.password);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            return res.status(StatusCodes.UNAUTHORIZED).json({ message: StatusMessages[StatusCodes.UNAUTHORIZED] });
+            return null;
         }
 
         const token = generateToken({ id: user._id, phone: user.phone, role: user.role });
 
-        return res.json({ id: user._id, token: token });
+        return {
+            id: user._id,
+            token: token,
+        };
     } catch (error) {
-        console.error("Login error:", error);
-        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-            success: false,
-            message: StatusMessages[StatusCodes.INTERNAL_SERVER_ERROR],
-        });
+        console.error("Login service error:", error);
+        throw error;
     }
 }

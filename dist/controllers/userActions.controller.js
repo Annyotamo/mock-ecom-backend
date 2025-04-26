@@ -26,9 +26,25 @@ function registerUser(req, res) {
 exports.registerUser = registerUser;
 function loginUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const loggedInUser = yield (0, loginUser_service_js_1.default)(req, res);
-        res.status(statusCodes_js_1.StatusCodes.ACCEPTED).json(loggedInUser);
-        return;
+        const { phone, password } = req.body;
+        try {
+            const loggedInUser = yield (0, loginUser_service_js_1.default)(phone, password);
+            if (loggedInUser) {
+                res.status(statusCodes_js_1.StatusCodes.OK).json(loggedInUser);
+                return;
+            }
+            else {
+                res.status(statusCodes_js_1.StatusCodes.UNAUTHORIZED).json({ message: "Invalid credentials" });
+                return;
+            }
+        }
+        catch (error) {
+            console.error("Login controller error:", error);
+            res.status(statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+                message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR],
+            });
+            return;
+        }
     });
 }
 exports.loginUser = loginUser;

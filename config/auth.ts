@@ -3,23 +3,14 @@ import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import { Response, Request, NextFunction } from "express";
 
-interface CustomRequest extends Request {
+export interface CustomRequest extends Request {
     user?: any;
 }
 
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET_KEY!;
-const JWT_EXPIRES_IN = "2m";
-
-export async function hashPassword(password: string) {
-    const saltRounds = 10;
-    return await bcrypt.hash(password, saltRounds);
-}
-
-export async function comparePassword(plainPassword: string, hashedPassword: string) {
-    return await bcrypt.compare(plainPassword, hashedPassword);
-}
+const JWT_EXPIRES_IN = "10m";
 
 export function generateToken(payload: string | object | Buffer) {
     return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
@@ -53,12 +44,20 @@ export function authenticateToken(req: CustomRequest, res: Response, next: NextF
     next();
 }
 
-export function authorizeRole(roles: [string]) {
+export function authorizeRole(allowedRoles: string[]) {
     return (req: CustomRequest, res: Response, next: NextFunction) => {
-        if (!req.user || !roles.includes(req.user.role)) {
-            res.status(403).json({ message: "Unauthorized" });
+        if (!req.user || !req.user.role || !Array.isArray(req.user.role)) {
+            res.status(403).json({ message: "Unauthorized: User roles not found or invalid" });
             return;
         }
+
+        const hasRequiredRole = req.user.role.some((userRole: string) => allowedRoles.includes(userRole));
+
+        if (!hasRequiredRole) {
+            res.status(403).json({ message: "Unauthorized: Insufficient permissions" });
+            return;
+        }
+
         next();
     };
 }

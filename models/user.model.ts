@@ -18,7 +18,6 @@ const userSchema = new mongoose.Schema<IUser>(
         password: {
             type: String,
             required: [true, "Please provide a password"],
-            select: false,
         },
         role: {
             type: [String],

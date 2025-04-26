@@ -12,31 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/services/loginUser.service.js (adjust path if needed)
-const user_model_js_1 = __importDefault(require("../models/user.model.js"));
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const auth_js_1 = require("../config/auth.js");
-function loginUserHelper(phone, password) {
+const deleteProduct_service_1 = __importDefault(require("../services/deleteProduct.service"));
+const statusCodes_1 = require("../utils/statusCodes");
+function deleteProduct(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const user = yield user_model_js_1.default.findOne({ phone: phone }).select("+password");
-            if (!user) {
-                return null;
+            const { id } = req.body;
+            const deletedData = yield (0, deleteProduct_service_1.default)(id);
+            if (deletedData.status != 200) {
+                res.status(deletedData.status).json(deletedData);
+                return;
             }
-            const isPasswordValid = yield bcryptjs_1.default.compare(password, user.password);
-            if (!isPasswordValid) {
-                return null;
-            }
-            const token = (0, auth_js_1.generateToken)({ id: user._id, phone: user.phone, role: user.role });
-            return {
-                id: user._id,
-                token: token,
-            };
+            res.status(deletedData.status).json(deletedData);
+            return;
         }
         catch (error) {
-            console.error("Login service error:", error);
-            throw error;
+            console.log("Error in deleting product:", error);
+            res.status(statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+                message: statusCodes_1.StatusMessages[statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR],
+            });
+            return;
         }
     });
 }
-exports.default = loginUserHelper;
+exports.default = deleteProduct;

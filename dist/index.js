@@ -14,10 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const db_js_1 = __importDefault(require("./config/db.js"));
-const productUpload_route_js_1 = __importDefault(require("./routes/productUpload.route.js"));
+const productActions_route_js_1 = __importDefault(require("./routes/productActions.route.js"));
 const products_route_js_1 = __importDefault(require("./routes/products.route.js"));
 const cors_1 = __importDefault(require("cors"));
 const userActions_route_1 = __importDefault(require("./routes/userActions.route"));
+const auth_js_1 = require("./config/auth.js");
 const port = 8000;
 const server = (0, express_1.default)();
 function startServer() {
@@ -26,9 +27,8 @@ function startServer() {
         server.use((0, cors_1.default)());
         server.use(express_1.default.json());
         server.use(express_1.default.urlencoded());
-        server.use("/api/product/upload", productUpload_route_js_1.default);
-        // server.use("/api/product/delete");
-        server.use("/api/products", products_route_js_1.default);
+        server.use("/api/product", auth_js_1.authenticateToken, (0, auth_js_1.authorizeRole)(["admin"]), productActions_route_js_1.default);
+        server.use("/api/products", auth_js_1.authenticateToken, products_route_js_1.default);
         server.use("/api/auth", userActions_route_1.default);
         // server.use("/api/purchase");
     });
