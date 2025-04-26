@@ -12,15 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const productData_model_1 = __importDefault(require("../models/productData.model"));
 const statusCodes_1 = require("../utils/statusCodes");
-function deleteProductHelper(id) {
+const transaction_model_1 = __importDefault(require("../models/transaction.model"));
+function deleteTransactionHelper(id) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const deletedProduct = yield productData_model_1.default.deleteOne({ _id: id });
+            const deletedTransaction = yield transaction_model_1.default.deleteOne({ _id: id });
             return {
                 status: statusCodes_1.StatusCodes.ACCEPTED,
-                user: deletedProduct,
+                user: deletedTransaction,
             };
         }
         catch (error) {
@@ -32,4 +32,4 @@ function deleteProductHelper(id) {
         }
     });
 }
-exports.default = deleteProductHelper;
+exports.default = deleteTransactionHelper;

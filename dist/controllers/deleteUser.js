@@ -12,24 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const productData_model_1 = __importDefault(require("../models/productData.model"));
+const deleteUser_service_1 = __importDefault(require("../services/deleteUser.service"));
 const statusCodes_1 = require("../utils/statusCodes");
-function deleteProductHelper(id) {
+function deleteUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const deletedProduct = yield productData_model_1.default.deleteOne({ _id: id });
-            return {
-                status: statusCodes_1.StatusCodes.ACCEPTED,
-                user: deletedProduct,
-            };
+            const { id } = req.body;
+            const deletedUser = yield (0, deleteUser_service_1.default)(id);
+            if (deletedUser.status != 200) {
+                res.status(deletedUser.status).json(deletedUser);
+                return;
+            }
+            res.status(deletedUser.status).json(deletedUser);
+            return;
         }
         catch (error) {
-            console.log("Error:", error);
-            return {
-                status: statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR,
-                error: error,
-            };
+            console.log("Error in deleting product:", error);
+            res.status(statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+                message: statusCodes_1.StatusMessages[statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR],
+            });
+            return;
         }
     });
 }
-exports.default = deleteProductHelper;
+exports.default = deleteUser;

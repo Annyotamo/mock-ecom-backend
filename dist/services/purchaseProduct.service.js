@@ -13,23 +13,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const productData_model_1 = __importDefault(require("../models/productData.model"));
-const statusCodes_1 = require("../utils/statusCodes");
-function deleteProductHelper(id) {
+const transaction_model_1 = __importDefault(require("../models/transaction.model"));
+function purchaseProductHelper(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const deletedProduct = yield productData_model_1.default.deleteOne({ _id: id });
+            const { id } = req.query;
+            console.log(id);
+            const productData = yield productData_model_1.default.findById(id);
+            console.log(productData);
+            if (!productData) {
+                return null;
+            }
+            const { name, price } = productData;
+            const newTransaction = yield transaction_model_1.default.create({
+                productId: id,
+                productName: name,
+                productPrice: price,
+            });
+            const transactionData = yield newTransaction.save();
             return {
-                status: statusCodes_1.StatusCodes.ACCEPTED,
-                user: deletedProduct,
+                message: "Purchased product successfully",
+                data: transactionData,
             };
         }
         catch (error) {
-            console.log("Error:", error);
-            return {
-                status: statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR,
-                error: error,
-            };
+            console.log("Error is product transaction:", error);
+            return null;
         }
     });
 }
-exports.default = deleteProductHelper;
+exports.default = purchaseProductHelper;

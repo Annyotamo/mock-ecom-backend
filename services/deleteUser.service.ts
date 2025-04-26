@@ -1,12 +1,12 @@
-import productModel from "../models/productData.model";
+import userModel from "../models/user.model";
 import { StatusCodes } from "../utils/statusCodes";
 
-export default async function deleteProductHelper(id: string) {
+export default async function deleteUserHelper(id: string) {
     try {
-        const deletedProduct = await productModel.deleteOne({ _id: id });
+        const deletedUser = await userModel.deleteOne({ _id: id });
         return {
             status: StatusCodes.ACCEPTED,
-            user: deletedProduct,
+            user: deletedUser,
         };
     } catch (error) {
         console.log("Error:", error);

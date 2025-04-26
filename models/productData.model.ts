@@ -8,8 +8,6 @@ export interface Product extends Document {
     s3FileName: String;
 }
 
-interface ProductDocument extends Product, Document {}
-
 const productDataSchema = new Schema<Product>(
     {
         name: {
