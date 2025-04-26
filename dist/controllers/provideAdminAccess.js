@@ -8,22 +8,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const statusCodes_1 = require("../utils/statusCodes");
-const deleteTransaction_service_1 = __importDefault(require("../services/deleteTransaction.service"));
-function deleteTransaction(req, res) {
+const provideAdminAccess_service_1 = require("../services/provideAdminAccess.service");
+function provideAdminAccess(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
+        const { id } = req.body;
         try {
-            const { id } = req.body;
-            const deletionResult = yield (0, deleteTransaction_service_1.default)(id);
-            res.status(deletionResult.status).json(deletionResult.data);
+            const adminAccessResult = yield (0, provideAdminAccess_service_1.provideAdminAccessHelper)(id);
+            res.status(adminAccessResult.status).json(adminAccessResult.data);
             return;
         }
         catch (error) {
-            console.error("Error in deleting transaction controller:", error);
+            console.error("Error in provideAdminAccess controller:", error);
             res.status(statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: statusCodes_1.StatusMessages[statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR],
@@ -32,4 +29,4 @@ function deleteTransaction(req, res) {
         }
     });
 }
-exports.default = deleteTransaction;
+exports.default = provideAdminAccess;

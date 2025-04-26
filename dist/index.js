@@ -19,7 +19,7 @@ const products_route_1 = __importDefault(require("./routes/products.route"));
 const cors_1 = __importDefault(require("cors"));
 const userActions_route_1 = __importDefault(require("./routes/userActions.route"));
 const auth_1 = require("./config/auth");
-const adminUserActions_1 = __importDefault(require("./routes/adminUserActions"));
+const adminUserActions_route_1 = __importDefault(require("./routes/adminUserActions.route"));
 const transactionRoute_1 = __importDefault(require("./routes/transactionRoute"));
 const port = 8000;
 const server = (0, express_1.default)();
@@ -32,7 +32,7 @@ function startServer() {
         server.use("/api/product", auth_1.authenticateToken, (0, auth_1.authorizeRole)(["admin"]), productActions_route_1.default);
         server.use("/api/products", auth_1.authenticateToken, products_route_1.default);
         server.use("/api/auth", userActions_route_1.default);
-        server.use("/api/user", auth_1.authenticateToken, (0, auth_1.authorizeRole)(["admin"]), adminUserActions_1.default);
+        server.use("/api/user", auth_1.authenticateToken, (0, auth_1.authorizeRole)(["admin"]), adminUserActions_route_1.default);
         server.use("/api/transaction", auth_1.authenticateToken, (0, auth_1.authorizeRole)(["admin"]), transactionRoute_1.default);
     });
 }

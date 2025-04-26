@@ -12,62 +12,41 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.provideAdminAccessHelper = void 0;
+const user_model_1 = __importDefault(require("../models/user.model"));
 const statusCodes_1 = require("../utils/statusCodes");
-const transaction_model_1 = __importDefault(require("../models/transaction.model"));
 const mongoose_1 = __importDefault(require("mongoose"));
-function deleteTransactionHelper(id) {
+function provideAdminAccessHelper(id) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
             return {
                 status: statusCodes_1.StatusCodes.BAD_REQUEST,
-                data: {
-                    success: false,
-                    message: "Invalid transaction ID format.",
-                },
+                data: { success: false, message: "Invalid user ID format." },
             };
         }
         try {
-            const existingTransaction = yield transaction_model_1.default.findById(id);
-            if (!existingTransaction) {
+            const updatedUser = yield user_model_1.default.findByIdAndUpdate(id, { $addToSet: { role: "admin" } }, { new: true });
+            if (!updatedUser) {
                 return {
                     status: statusCodes_1.StatusCodes.NOT_FOUND,
-                    data: {
-                        success: false,
-                        message: "Transaction not found.",
-                    },
+                    data: { success: false, message: "User not found." },
                 };
             }
-            const deletedTransaction = yield transaction_model_1.default.deleteOne({ _id: id });
-            if (deletedTransaction.deletedCount > 0) {
-                return {
-                    status: statusCodes_1.StatusCodes.ACCEPTED,
-                    data: {
-                        success: true,
-                        message: "Transaction deleted successfully",
-                        deletedTransaction: existingTransaction,
-                    },
-                };
-            }
-            else {
-                return {
-                    status: statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR,
-                    data: {
-                        success: false,
-                        message: "Failed to delete transaction.",
-                    },
-                };
-            }
+            return {
+                status: statusCodes_1.StatusCodes.OK,
+                data: { success: true, message: "Admin access granted", user: updatedUser },
+            };
         }
         catch (error) {
-            console.error("Error deleting transaction:", error);
+            console.error("Error granting admin access:", error.message);
             return {
                 status: statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR,
                 data: {
                     success: false,
-                    message: "An error occurred while deleting the transaction.",
+                    message: "Failed to grant admin access.",
                 },
             };
         }
     });
 }
-exports.default = deleteTransactionHelper;
+exports.provideAdminAccessHelper = provideAdminAccessHelper;

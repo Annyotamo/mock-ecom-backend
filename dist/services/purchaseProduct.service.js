@@ -14,15 +14,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const productData_model_1 = __importDefault(require("../models/productData.model"));
 const transaction_model_1 = __importDefault(require("../models/transaction.model"));
+const statusCodes_1 = require("../utils/statusCodes");
+const mongoose_1 = __importDefault(require("mongoose"));
 function purchaseProductHelper(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { id } = req.query;
-            console.log(id);
+            if (!id) {
+                return {
+                    status: statusCodes_1.StatusCodes.BAD_REQUEST,
+                    data: { success: false, message: "Product ID is required." },
+                };
+            }
+            if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
+                return {
+                    status: statusCodes_1.StatusCodes.BAD_REQUEST,
+                    data: { success: false, message: "Invalid product ID format." },
+                };
+            }
             const productData = yield productData_model_1.default.findById(id);
-            console.log(productData);
             if (!productData) {
-                return null;
+                return {
+                    status: statusCodes_1.StatusCodes.NOT_FOUND,
+                    data: { success: false, message: "Product not found." },
+                };
             }
             const { name, price } = productData;
             const newTransaction = yield transaction_model_1.default.create({
@@ -32,13 +47,23 @@ function purchaseProductHelper(req, res) {
             });
             const transactionData = yield newTransaction.save();
             return {
-                message: "Purchased product successfully",
-                data: transactionData,
+                status: statusCodes_1.StatusCodes.ACCEPTED,
+                data: {
+                    success: true,
+                    message: "Purchased product successfully",
+                    transaction: transactionData,
+                },
             };
         }
         catch (error) {
-            console.log("Error is product transaction:", error);
-            return null;
+            console.error("Error in product transaction:", error);
+            return {
+                status: statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: "An error occurred during the purchase process.",
+                },
+            };
         }
     });
 }

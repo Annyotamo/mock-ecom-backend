@@ -26,12 +26,12 @@ function authenticateToken(req, res, next) {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     if (token == null) {
-        res.status(401).json({ message: "Authentication required" });
+        res.status(401).json({ success: false, message: "Authentication required" });
         return;
     }
     const user = verifyToken(token);
     if (!user) {
-        res.status(403).json({ message: "Invalid or expired token" });
+        res.status(403).json({ success: false, message: "Invalid or expired token" });
         return;
     }
     req.user = user;
@@ -41,12 +41,12 @@ exports.authenticateToken = authenticateToken;
 function authorizeRole(allowedRoles) {
     return (req, res, next) => {
         if (!req.user || !req.user.role || !Array.isArray(req.user.role)) {
-            res.status(403).json({ message: "Unauthorized: User roles not found or invalid" });
+            res.status(403).json({ success: false, message: "Unauthorized: User roles not found or invalid" });
             return;
         }
         const hasRequiredRole = req.user.role.some((userRole) => allowedRoles.includes(userRole));
         if (!hasRequiredRole) {
-            res.status(403).json({ message: "Unauthorized: Insufficient permissions" });
+            res.status(403).json({ success: false, message: "Unauthorized: Insufficient permissions" });
             return;
         }
         next();

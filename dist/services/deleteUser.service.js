@@ -14,20 +14,57 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const user_model_1 = __importDefault(require("../models/user.model"));
 const statusCodes_1 = require("../utils/statusCodes");
+const mongoose_1 = __importDefault(require("mongoose"));
 function deleteUserHelper(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const deletedUser = yield user_model_1.default.deleteOne({ _id: id });
+        if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
             return {
-                status: statusCodes_1.StatusCodes.ACCEPTED,
-                user: deletedUser,
+                status: statusCodes_1.StatusCodes.BAD_REQUEST,
+                data: {
+                    success: false,
+                    message: "Invalid user ID format.",
+                },
             };
         }
+        try {
+            const existingUser = yield user_model_1.default.findById(id);
+            if (!existingUser) {
+                return {
+                    status: statusCodes_1.StatusCodes.NOT_FOUND,
+                    data: {
+                        success: false,
+                        message: "User not found.",
+                    },
+                };
+            }
+            const deletedUser = yield user_model_1.default.deleteOne({ _id: id });
+            if (deletedUser.deletedCount > 0) {
+                return {
+                    status: statusCodes_1.StatusCodes.ACCEPTED,
+                    data: {
+                        success: true,
+                        message: "User deleted successfully",
+                    },
+                };
+            }
+            else {
+                return {
+                    status: statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR,
+                    data: {
+                        success: false,
+                        message: "Failed to delete user.",
+                    },
+                };
+            }
+        }
         catch (error) {
-            console.log("Error:", error);
+            console.error("Error deleting user:", error);
             return {
                 status: statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR,
-                error: error,
+                data: {
+                    success: false,
+                    message: "An error occurred while deleting the user.",
+                },
             };
         }
     });

@@ -12,30 +12,52 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/services/loginUser.service.js (adjust path if needed)
 const user_model_js_1 = __importDefault(require("../models/user.model.js"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const auth_js_1 = require("../config/auth.js");
+const statusCodes_js_1 = require("../utils/statusCodes.js");
 function loginUserHelper(phone, password) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const user = yield user_model_js_1.default.findOne({ phone: phone }).select("+password");
             if (!user) {
-                return null;
+                return {
+                    status: statusCodes_js_1.StatusCodes.BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.BAD_REQUEST],
+                    },
+                };
             }
             const isPasswordValid = yield bcryptjs_1.default.compare(password, user.password);
             if (!isPasswordValid) {
-                return null;
+                return {
+                    status: statusCodes_js_1.StatusCodes.UNAUTHORIZED,
+                    data: {
+                        success: false,
+                        message: "Invalid credentials",
+                    },
+                };
             }
             const token = (0, auth_js_1.generateToken)({ id: user._id, phone: user.phone, role: user.role });
             return {
-                id: user._id,
-                token: token,
+                status: statusCodes_js_1.StatusCodes.OK,
+                data: {
+                    success: true,
+                    id: user._id,
+                    token: token,
+                },
             };
         }
         catch (error) {
             console.error("Login service error:", error);
-            throw error;
+            return {
+                status: statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR],
+                },
+            };
         }
     });
 }

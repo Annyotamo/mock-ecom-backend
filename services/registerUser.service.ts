@@ -5,21 +5,38 @@ import userModel from "../models/user.model.js";
 export default async function registerUserHelper(req: Request, res: Response) {
     try {
         const { phone, password, role = ["user"] } = req.body;
-        console.log(phone, password);
 
         if (!phone || !password) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                success: false,
-                message: StatusMessages[StatusCodes.BAD_REQUEST],
-            });
+            return {
+                status: StatusCodes.BAD_REQUEST,
+                data: {
+                    success: false,
+                    message: StatusMessages[StatusCodes.BAD_REQUEST],
+                },
+            };
+        }
+
+        const phoneRegex = /^\d{10}$/;
+
+        if (!phoneRegex.test(phone)) {
+            return {
+                status: StatusCodes.BAD_REQUEST,
+                data: {
+                    success: false,
+                    message: "Enter a 10 digit phone number",
+                },
+            };
         }
 
         const existingUser = await userModel.findOne({ phone });
         if (existingUser) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                success: false,
-                message: StatusMessages[StatusCodes.BAD_REQUEST],
-            });
+            return {
+                status: StatusCodes.BAD_REQUEST,
+                data: {
+                    success: false,
+                    message: "Pre-existing phone number",
+                },
+            };
         }
 
         const user = await userModel.create({
@@ -28,20 +45,26 @@ export default async function registerUserHelper(req: Request, res: Response) {
             role,
         });
 
-        res.status(StatusCodes.CREATED).json({
-            success: true,
-            message: StatusMessages[StatusCodes.CREATED],
-            user: {
-                id: user._id,
-                phone: user.phone,
-                role: user.role,
+        return {
+            status: StatusCodes.CREATED,
+            data: {
+                success: true,
+                message: StatusMessages[StatusCodes.CREATED],
+                user: {
+                    id: user._id,
+                    phone: user.phone,
+                    role: user.role,
+                },
             },
-        });
+        };
     } catch (error) {
         console.error("Registration error:", error);
-        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-            success: false,
-            message: StatusMessages[StatusCodes.INTERNAL_SERVER_ERROR],
-        });
+        return {
+            status: StatusCodes.INTERNAL_SERVER_ERROR,
+            data: {
+                success: false,
+                message: StatusMessages[StatusCodes.INTERNAL_SERVER_ERROR],
+            },
+        };
     }
 }

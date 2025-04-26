@@ -18,41 +18,62 @@ function registerUserHelper(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { phone, password, role = ["user"] } = req.body;
-            console.log(phone, password);
             if (!phone || !password) {
-                return res.status(statusCodes_js_1.StatusCodes.BAD_REQUEST).json({
-                    success: false,
-                    message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.BAD_REQUEST],
-                });
+                return {
+                    status: statusCodes_js_1.StatusCodes.BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.BAD_REQUEST],
+                    },
+                };
+            }
+            const phoneRegex = /^\d{10}$/;
+            if (!phoneRegex.test(phone)) {
+                return {
+                    status: statusCodes_js_1.StatusCodes.BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Enter a 10 digit phone number",
+                    },
+                };
             }
             const existingUser = yield user_model_js_1.default.findOne({ phone });
             if (existingUser) {
-                return res.status(statusCodes_js_1.StatusCodes.BAD_REQUEST).json({
-                    success: false,
-                    message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.BAD_REQUEST],
-                });
+                return {
+                    status: statusCodes_js_1.StatusCodes.BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Pre-existing phone number",
+                    },
+                };
             }
             const user = yield user_model_js_1.default.create({
                 phone,
                 password,
                 role,
             });
-            res.status(statusCodes_js_1.StatusCodes.CREATED).json({
-                success: true,
-                message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.CREATED],
-                user: {
-                    id: user._id,
-                    phone: user.phone,
-                    role: user.role,
+            return {
+                status: statusCodes_js_1.StatusCodes.CREATED,
+                data: {
+                    success: true,
+                    message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.CREATED],
+                    user: {
+                        id: user._id,
+                        phone: user.phone,
+                        role: user.role,
+                    },
                 },
-            });
+            };
         }
         catch (error) {
             console.error("Registration error:", error);
-            return res.status(statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR],
-            });
+            return {
+                status: statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR],
+                },
+            };
         }
     });
 }

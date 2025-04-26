@@ -18,9 +18,22 @@ const registerUser_service_js_1 = __importDefault(require("../services/registerU
 const loginUser_service_js_1 = __importDefault(require("../services/loginUser.service.js"));
 function registerUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const newUser = yield (0, registerUser_service_js_1.default)(req, res);
-        res.status(statusCodes_js_1.StatusCodes.ACCEPTED).json(newUser);
-        return;
+        try {
+            const newUser = yield (0, registerUser_service_js_1.default)(req, res);
+            if (newUser.status != statusCodes_js_1.StatusCodes.CREATED) {
+                res.status(newUser.status).json(newUser.data);
+                return;
+            }
+            res.status(statusCodes_js_1.StatusCodes.ACCEPTED).json(newUser.data);
+            return;
+        }
+        catch (error) {
+            console.error("Error creating new user [userActions.ts]:", error);
+            res.status(statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR],
+            });
+        }
     });
 }
 exports.registerUser = registerUser;
@@ -29,17 +42,14 @@ function loginUser(req, res) {
         const { phone, password } = req.body;
         try {
             const loggedInUser = yield (0, loginUser_service_js_1.default)(phone, password);
-            if (loggedInUser) {
-                res.status(statusCodes_js_1.StatusCodes.OK).json(loggedInUser);
+            if (loggedInUser.status != statusCodes_js_1.StatusCodes.OK) {
+                res.status(loggedInUser.status).json(loggedInUser.data);
                 return;
             }
-            else {
-                res.status(statusCodes_js_1.StatusCodes.UNAUTHORIZED).json({ message: "Invalid credentials" });
-                return;
-            }
+            res.status(statusCodes_js_1.StatusCodes.OK).json(loggedInUser.data);
         }
         catch (error) {
-            console.error("Login controller error:", error);
+            console.error("Error during login [userActions.ts]", error);
             res.status(statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
                 message: statusCodes_js_1.StatusMessages[statusCodes_js_1.StatusCodes.INTERNAL_SERVER_ERROR],
             });

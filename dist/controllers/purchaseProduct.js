@@ -17,19 +17,17 @@ const purchaseProduct_service_1 = __importDefault(require("../services/purchaseP
 function purchaseProduct(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const transactionData = yield (0, purchaseProduct_service_1.default)(req, res);
-            if (!transactionData) {
-                res.status(statusCodes_1.StatusCodes.BAD_REQUEST).json({ message: statusCodes_1.StatusMessages[statusCodes_1.StatusCodes.BAD_REQUEST] });
-                return;
-            }
-            res.status(statusCodes_1.StatusCodes.ACCEPTED).json(transactionData);
+            const transactionResult = yield (0, purchaseProduct_service_1.default)(req, res);
+            res.status(transactionResult.status).json(transactionResult.data);
             return;
         }
         catch (error) {
-            console.log("Error in product transaction:", error);
+            console.error("Error in product transaction controller:", error);
             res.status(statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success: false,
                 message: statusCodes_1.StatusMessages[statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR],
             });
+            return;
         }
     });
 }

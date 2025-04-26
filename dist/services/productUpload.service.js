@@ -37,14 +37,18 @@ function uploadToS3(file) {
             };
             const data = yield s3.upload(params).promise();
             yield promises_1.default.unlink(file.path);
-            return { s3Url: data.Location, s3FileName: file.filename };
+            return {
+                success: true,
+                message: "File uploaded to S3 successfully.",
+                data: { s3Url: data.Location, s3FileName: file.filename },
+            };
         }
         catch (error) {
             console.error("Error uploading to S3:", error);
             if (file && file.path) {
                 yield promises_1.default.unlink(file.path);
             }
-            throw new Error("Error uploading file to S3.");
+            return { success: false, message: "Error uploading file to S3." };
         }
     });
 }
@@ -52,15 +56,37 @@ function productUpload(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { name, description, price } = req.body;
         if (!name || !description || !price) {
-            res.status(statusCodes_1.StatusCodes.BAD_REQUEST).json({ message: statusCodes_1.StatusMessages[statusCodes_1.StatusCodes.BAD_REQUEST] });
+            res.status(statusCodes_1.StatusCodes.BAD_REQUEST).json({
+                success: false,
+                message: statusCodes_1.StatusMessages[statusCodes_1.StatusCodes.BAD_REQUEST],
+            });
             return;
         }
         if (!req.file) {
-            res.status(400).send("No file uploaded.");
+            res.status(statusCodes_1.StatusCodes.BAD_REQUEST).json({
+                success: false,
+                message: "No file uploaded.",
+            });
+            return;
+        }
+        const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+        if (!allowedMimeTypes.includes(req.file.mimetype)) {
+            res.status(statusCodes_1.StatusCodes.BAD_REQUEST).json({
+                success: false,
+                message: "Only image files (jpeg, png, gif, webp) are allowed.",
+            });
             return;
         }
         try {
-            const { s3Url, s3FileName } = yield uploadToS3(req.file);
+            const uploadResult = yield uploadToS3(req.file);
+            if (!uploadResult.success) {
+                res.status(statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+                    success: false,
+                    message: uploadResult.message,
+                });
+                return;
+            }
+            const { s3Url, s3FileName } = uploadResult.data;
             const newProduct = new productData_model_1.default({
                 name,
                 description,
@@ -69,14 +95,18 @@ function productUpload(req, res) {
                 s3Url,
             });
             const savedProduct = yield newProduct.save();
-            res.status(200).send({
+            res.status(statusCodes_1.StatusCodes.OK).json({
+                success: true,
                 message: "Product successfully created",
                 product: savedProduct,
             });
         }
         catch (error) {
             console.error("Error in productUpload:", error.message);
-            res.status(500).send(error.message);
+            res.status(statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: error.message,
+            });
         }
     });
 }

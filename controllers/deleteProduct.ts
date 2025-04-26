@@ -6,15 +6,12 @@ export default async function deleteProduct(req: Request, res: Response) {
     try {
         const { id } = req.body;
         const deletedData = await deleteProductHelper(id);
-        if (deletedData.status != 200) {
-            res.status(deletedData.status).json(deletedData);
-            return;
-        }
-        res.status(deletedData.status).json(deletedData);
+        res.status(deletedData.status).json(deletedData.data);
         return;
     } catch (error) {
-        console.log("Error in deleting product:", error);
+        console.error("Error in deleting product:", error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            success: false,
             message: StatusMessages[StatusCodes.INTERNAL_SERVER_ERROR],
         });
         return;

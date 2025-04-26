@@ -14,20 +14,57 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const productData_model_1 = __importDefault(require("../models/productData.model"));
 const statusCodes_1 = require("../utils/statusCodes");
+const mongoose_1 = __importDefault(require("mongoose"));
 function deleteProductHelper(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const deletedProduct = yield productData_model_1.default.deleteOne({ _id: id });
+        if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
             return {
-                status: statusCodes_1.StatusCodes.ACCEPTED,
-                user: deletedProduct,
+                status: statusCodes_1.StatusCodes.BAD_REQUEST,
+                data: {
+                    success: false,
+                    message: "Invalid product ID format.",
+                },
             };
         }
+        try {
+            const existingProduct = yield productData_model_1.default.findById(id);
+            if (!existingProduct) {
+                return {
+                    status: statusCodes_1.StatusCodes.NOT_FOUND,
+                    data: {
+                        success: false,
+                        message: "Product not found.",
+                    },
+                };
+            }
+            const deletedProduct = yield productData_model_1.default.deleteOne({ _id: id });
+            if (deletedProduct.deletedCount > 0) {
+                return {
+                    status: statusCodes_1.StatusCodes.ACCEPTED,
+                    data: {
+                        success: true,
+                        message: "Product deleted successfully",
+                    },
+                };
+            }
+            else {
+                return {
+                    status: statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR,
+                    data: {
+                        success: false,
+                        message: "Failed to delete product.",
+                    },
+                };
+            }
+        }
         catch (error) {
-            console.log("Error:", error);
+            console.error("Error deleting product:", error);
             return {
                 status: statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR,
-                error: error,
+                data: {
+                    success: false,
+                    message: "An error occurred while deleting the product.",
+                },
             };
         }
     });

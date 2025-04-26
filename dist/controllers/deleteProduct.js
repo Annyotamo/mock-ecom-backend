@@ -19,16 +19,13 @@ function deleteProduct(req, res) {
         try {
             const { id } = req.body;
             const deletedData = yield (0, deleteProduct_service_1.default)(id);
-            if (deletedData.status != 200) {
-                res.status(deletedData.status).json(deletedData);
-                return;
-            }
-            res.status(deletedData.status).json(deletedData);
+            res.status(deletedData.status).json(deletedData.data);
             return;
         }
         catch (error) {
-            console.log("Error in deleting product:", error);
+            console.error("Error in deleting product:", error);
             res.status(statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success: false,
                 message: statusCodes_1.StatusMessages[statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR],
             });
             return;

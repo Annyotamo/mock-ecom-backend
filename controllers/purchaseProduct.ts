@@ -4,17 +4,15 @@ import purchaseProductHelper from "../services/purchaseProduct.service";
 
 export default async function purchaseProduct(req: Request, res: Response) {
     try {
-        const transactionData = await purchaseProductHelper(req, res);
-        if (!transactionData) {
-            res.status(StatusCodes.BAD_REQUEST).json({ message: StatusMessages[StatusCodes.BAD_REQUEST] });
-            return;
-        }
-        res.status(StatusCodes.ACCEPTED).json(transactionData);
+        const transactionResult = await purchaseProductHelper(req, res);
+        res.status(transactionResult.status).json(transactionResult.data);
         return;
     } catch (error) {
-        console.log("Error in product transaction:", error);
+        console.error("Error in product transaction controller:", error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            success: false,
             message: StatusMessages[StatusCodes.INTERNAL_SERVER_ERROR],
         });
+        return;
     }
 }

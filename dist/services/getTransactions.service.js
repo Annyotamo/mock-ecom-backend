@@ -12,24 +12,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getTransactionsHelper = void 0;
+const transaction_model_1 = __importDefault(require("../models/transaction.model"));
 const statusCodes_1 = require("../utils/statusCodes");
-const deleteTransaction_service_1 = __importDefault(require("../services/deleteTransaction.service"));
-function deleteTransaction(req, res) {
+function getTransactionsHelper() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { id } = req.body;
-            const deletionResult = yield (0, deleteTransaction_service_1.default)(id);
-            res.status(deletionResult.status).json(deletionResult.data);
-            return;
+            const transactions = yield transaction_model_1.default.find({});
+            return {
+                status: statusCodes_1.StatusCodes.OK,
+                data: {
+                    success: true,
+                    message: "Transactions retrieved successfully.",
+                    transactions,
+                },
+            };
         }
         catch (error) {
-            console.error("Error in deleting transaction controller:", error);
-            res.status(statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                message: statusCodes_1.StatusMessages[statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR],
-            });
-            return;
+            console.error("Error fetching transactions:", error.message);
+            return {
+                status: statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: "Failed to retrieve transactions.",
+                },
+            };
         }
     });
 }
-exports.default = deleteTransaction;
+exports.getTransactionsHelper = getTransactionsHelper;

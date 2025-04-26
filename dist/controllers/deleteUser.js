@@ -18,17 +18,14 @@ function deleteUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { id } = req.body;
-            const deletedUser = yield (0, deleteUser_service_1.default)(id);
-            if (deletedUser.status != 200) {
-                res.status(deletedUser.status).json(deletedUser);
-                return;
-            }
-            res.status(deletedUser.status).json(deletedUser);
+            const deletedData = yield (0, deleteUser_service_1.default)(id);
+            res.status(deletedData.status).json(deletedData.data);
             return;
         }
         catch (error) {
-            console.log("Error in deleting product:", error);
+            console.error("Error in deleting user:", error);
             res.status(statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success: false,
                 message: statusCodes_1.StatusMessages[statusCodes_1.StatusCodes.INTERNAL_SERVER_ERROR],
             });
             return;

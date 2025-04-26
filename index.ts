@@ -5,7 +5,7 @@ import productsRouter from "./routes/products.route";
 import cors from "cors";
 import userActionsRouter from "./routes/userActions.route";
 import { authenticateToken, authorizeRole } from "./config/auth";
-import adminUserActionsRouter from "./routes/adminUserActions";
+import adminUserActionsRouter from "./routes/adminUserActions.route";
 import transactionsRouter from "./routes/transactionRoute";
 
 const port = 8000;
